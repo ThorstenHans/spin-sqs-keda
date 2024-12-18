@@ -1,0 +1,30 @@
+spin_manifest_version = 2
+
+[application]
+name = "spin-app"
+version = "0.1.0"
+authors = ["Thorsten Hans <thorsten.hans@fermyon.com>"]
+description = ""
+
+[variables]
+redis_connection_string = { required = true }
+redis_host = { required = true }
+redis_port = { required = true }
+
+[[trigger.sqs]]
+component = "customer-transformer"
+queue_url = ""
+max_messages = 1
+idle_wait_seconds = 3
+system_attributes = ["All"]
+
+[component.customer-transformer]
+source = "customer-transformer/target/wasm32-wasi/release/customer_transformer.wasm"
+allowed_outbound_hosts = ["redis://{{ redis_host }}:{{ redis_port }}"]
+
+[component.customer-transformer.variables]
+redis_connection_string = "{{ redis_connection_string }}"
+
+[component.customer-transformer.build]
+workdir = "customer-transformer"
+command = "cargo build --target wasm32-wasi --release"

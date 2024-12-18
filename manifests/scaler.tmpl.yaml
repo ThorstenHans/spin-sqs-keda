@@ -1,0 +1,35 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: aws-credentials
+spec:
+  secretTargetRef:
+    - parameter: awsAccessKeyID
+      name: aws-credentials
+      key: AWS_ACCESS_KEY_ID
+    - parameter: awsSecretAccessKey
+      name: aws-credentials
+      key: AWS_SECRET_ACCESS_KEY
+    - parameter: awsSessionToken
+      name: aws-credentials
+      key: AWS_SESSION_TOKEN
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: customer-transformer-sqs-scaler
+spec:
+  minReplicaCount: 0
+  maxReplicaCount: 10
+  pollingInterval: 2
+  cooldownPeriod: 30
+  scaleTargetRef:
+    name: customer-transformer
+  triggers:
+    - type: aws-sqs-queue
+      authenticationRef:
+        name: aws-credentials
+      metadata:
+        queueURL: SQS_QUEUE_URL
+        queueLength: "10"
+        awsRegion: AWS_REGION

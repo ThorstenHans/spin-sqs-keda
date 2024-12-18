@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-transformer
+spec:
+  selector:
+    matchLabels:
+      app: customer-transformer
+  template:
+    metadata:
+      labels:
+        app: customer-transformer
+    spec:
+      runtimeClassName: wasmtime-spin-v2
+      volumes:
+        - name: spin-ca
+          secret:
+            secretName: spin-ca
+            items:
+              - key: "ca-certificates.crt"
+                path: "ca-certificates.crt"
+      containers:
+        - name: customer-transformer
+          image: "ttl.sh/customer-transformer:24h"
+          command: ["/"]
+          volumeMounts:
+            - mountPath: /etc/ssl/certs/ca-certificates.crt
+              name: spin-ca
+              subPath: "ca-certificates.crt"
+              readOnly: true
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "50m"
+          env:
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: aws
+                  key: region
+                  optional: false
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: AWS_ACCESS_KEY_ID
+                  optional: false
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: AWS_SECRET_ACCESS_KEY
+                  optional: false
+            - name: AWS_SESSION_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: AWS_SESSION_TOKEN
+                  optional: false
+            - name: SPIN_VARIABLE_REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: valkey
+                  key: port
+                  optional: false
+            - name: SPIN_VARIABLE_REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: valkey
+                  key: host
+                  optional: false
+            - name: REDIS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: valkey
+                  key: valkey-url
+                  optional: false
