@@ -65,7 +65,7 @@ Run the application as shown here:
 pushd src/loader
 export QUEUE_URL="<YOUR_QUEUE_URL>"
 
-cargo run --message-count 1000 --queue-url $QUEUE_URL
+cargo run -- --message-count 1000 --queue-url $QUEUE_URL
 
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.25s
      Running `target/debug/loader --message-count 1000 --queue-url ***`
