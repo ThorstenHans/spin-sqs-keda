@@ -23,4 +23,6 @@ helm install spin-operator \
   --wait \
   oci://ghcr.io/spinkube/charts/spin-operator
 
+kubectl apply -f https://raw.githubusercontent.com/spinkube/spin-operator/07a3175c25f47c722fb9510fc6999a9665cff289/config/samples/simple.yaml
+
 echo "✅ SpinKube deployed to your Kubernetes Cluster"

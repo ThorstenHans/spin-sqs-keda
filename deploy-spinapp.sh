@@ -36,7 +36,7 @@ if [[ -z "${AWS_SESSION_TOKEN:-}" ]]; then
 fi
 
 pushd manifests
-
+kubectl delete secret aws-credentials --ignore-not-found=true
 kubectl create secret generic aws-credentials \
   --from-literal=AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
   --from-literal=AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
